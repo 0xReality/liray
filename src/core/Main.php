@@ -2,20 +2,16 @@
 
 namespace core;
 
-use pocketmine\block\Block;
-use pocketmine\block\BlockIdentifier;
-use pocketmine\event\block\BaseBlockChangeEvent;
+
+use pocketmine\block\BlockTypeIds;
 use pocketmine\event\block\BlockBreakEvent;
-use pocketmine\event\block\BlockUpdateEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
-use pocketmine\utils\TextFormat;
 
 
 class Main extends PluginBase implements Listener
@@ -24,34 +20,33 @@ class Main extends PluginBase implements Listener
     private const FBF = 3;
 
     private array $NR = [
-        129, // Emerald Ore
-        27,  // Powered Rail
-        56,  // Diamond Ore
-
+        BlockTypeIds::EMERALD_ORE,
+        BlockTypeIds::POWERED_RAIL,
+        BlockTypeIds::DIAMOND_ORE,
+        BlockTypeIds::IRON_ORE,
     ];
 
     private array $OU = [
-        118, // Cauldron
-        116, // Enchanting Table
-        61,  // Furnace
-        154, // Hopper
-        152, // Redstone Block
-        21,  // Lapis Lazuli Ore
-        58,  // Crafting Table
-        117, // Brewing Stand
+        BlockTypeIds::CAULDRON,
+        BlockTypeIds::ENCHANTING_TABLE,
+        BlockTypeIds::FURNACE,
+        BlockTypeIds::HOPPER,
+        BlockTypeIds::REDSTONE,
+        BlockTypeIds::LAPIS_LAZULI_ORE,
+        BlockTypeIds::CRAFTING_TABLE,
+        BlockTypeIds::BREWING_STAND,
     ];
 
     private array $OD = [
-        116, // Enchanting Table
-        130, // Ender Chest
-        7,   // Bedrock
-        120, // End Portal Frame
-        145, // Anvil
-        130, // Ender Chest
-        2,   // Grass Block
-        148, // Grindstone
-
+        BlockTypeIds::ENCHANTING_TABLE,
+        BlockTypeIds::ENDER_CHEST,
+        BlockTypeIds::BEDROCK,
+        BlockTypeIds::END_PORTAL_FRAME,
+        BlockTypeIds::ANVIL,
+        BlockTypeIds::ENDER_CHEST,
+        BlockTypeIds::GRASS,
     ];
+
 
 
     public function onEnable(): void {
@@ -127,20 +122,20 @@ class Main extends PluginBase implements Listener
                 $world = $player->getWorld();
                 $block = $world->getBlock($b);
                 switch ($block->getTypeId()) {
-                    case 1:
-                        $this->sendReplacementBlockPacket($players, $b->asVector3(), 1);
+                    case BlockTypeIds::STONE:
+                        $this->sendReplacementBlockPacket($players, $b->asVector3(), BlockTypeIds::STONE);
                         break;
-                    case 3:
-                        $this->sendReplacementBlockPacket($players, $b->asVector3(), 3);
+                    case BlockTypeIds::DIRT:
+                        $this->sendReplacementBlockPacket($players, $b->asVector3(), BlockTypeIds::DIRT);
                         break;
-                    case 2:
-                        $this->sendReplacementBlockPacket($players, $b->asVector3(), 2);
+                    case BlockTypeIds::GRASS:
+                        $this->sendReplacementBlockPacket($players, $b->asVector3(), BlockTypeIds::GRASS);
                         break;
-                    case 12:
-                        $this->sendReplacementBlockPacket($players, $b->asVector3(), 12);
+                    case BlockTypeIds::SAND:
+                        $this->sendReplacementBlockPacket($players, $b->asVector3(), BlockTypeIds::SAND);
                         break;
-                    case 13:
-                        $this->sendReplacementBlockPacket($players, $b->asVector3(), 13);
+                    case BlockTypeIds::GRAVEL:
+                        $this->sendReplacementBlockPacket($players, $b->asVector3(), BlockTypeIds::GRAVEL);
                         break;
                 }
             }
