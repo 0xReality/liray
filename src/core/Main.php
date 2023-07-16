@@ -3,7 +3,7 @@
 namespace core;
 
 use pocketmine\block\Block;
-use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\BlockIdentifier;
 use pocketmine\event\block\BaseBlockChangeEvent;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockUpdateEvent;
@@ -68,7 +68,6 @@ class Main extends PluginBase implements Listener
     public function onTick(PlayerMoveEvent $event): void
     {
         $player = $event->getPlayer();
-        $player->sendMessage("Hello " . $player->getName());
         $world = $player->getWorld();
         $c = $player->getPosition()->floor(16)->asVector3();
         $s = mt_rand(0, self::FBF - 1);
@@ -80,8 +79,9 @@ class Main extends PluginBase implements Listener
                     if ($i % self::FBF === $s) {
                         $pos = new Vector3($x * 16 + mt_rand(0, 15), $y * 16 + mt_rand(0, 15), $z * 16 + mt_rand(0, 15));
                         $block = $world->getBlock($pos);
+                        $id = 0;
 
-                        switch ($block->getId()) {
+                        switch ($block->getTypeId()) {
                             default:
                                 break;
                             case 0:
@@ -107,56 +107,42 @@ class Main extends PluginBase implements Listener
         }
     }
 
-    public function interact(PlayerInteractEvent $event)
-    {
-        $player = $event->getPlayer();
-        $block = $event->getBlock();
-        if($block->getId() === 4){
-            $player->sendMessage("Vous avez clicker sur une cobble");
-        }
-    }
 
     public function onStartDestroyBlock(BlockBreakEvent $event): void
     {
         $block = $event->getBlock();
         if (!$block->isTransparent()) {
             $this->reloadBlockListeners($block->getPosition());
-            $player = $event->getPlayer();
-            $player->sendMessage(TextFormat::GREEN . "You broke a block!");
         }
     }
 
-    public function onBlockChanged(BaseBlockChangeEvent $event): void
-    {
-        $block = $event->getBlock();
-        $against = $event->getNewState();
-        if (!$block->isTransparent() && $against->isTransparent()) {
-            $this->reloadBlockListeners($against->getPosition());
-        }
-    }
 
     private function reloadBlockListeners(Vector3 $pos): void
     {
         $players = $this->getServer()->getOnlinePlayers();
         $blocks = $this->getBlocksAllFaces($pos);
 
-        foreach ($blocks as $b) {
-            switch ($b->getId()) {
-                case 1:
-                    $this->sendReplacementBlockPacket($players, $b->asVector3(), 1);
-                    break;
-                case 3:
-                    $this->sendReplacementBlockPacket($players, $b->asVector3(), 3);
-                    break;
-                case 2:
-                    $this->sendReplacementBlockPacket($players, $b->asVector3(), 2);
-                    break;
-                case 12:
-                    $this->sendReplacementBlockPacket($players, $b->asVector3(), 12);
-                    break;
-                case 13:
-                    $this->sendReplacementBlockPacket($players, $b->asVector3(), 13);
-                    break;
+        foreach ($players as $player){
+            foreach ($blocks as $b) {
+                $world = $player->getWorld();
+                $block = $world->getBlock($b);
+                switch ($block->getTypeId()) {
+                    case 1:
+                        $this->sendReplacementBlockPacket($players, $b->asVector3(), 1);
+                        break;
+                    case 3:
+                        $this->sendReplacementBlockPacket($players, $b->asVector3(), 3);
+                        break;
+                    case 2:
+                        $this->sendReplacementBlockPacket($players, $b->asVector3(), 2);
+                        break;
+                    case 12:
+                        $this->sendReplacementBlockPacket($players, $b->asVector3(), 12);
+                        break;
+                    case 13:
+                        $this->sendReplacementBlockPacket($players, $b->asVector3(), 13);
+                        break;
+                }
             }
         }
     }
