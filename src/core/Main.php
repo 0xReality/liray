@@ -9,6 +9,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
@@ -176,12 +177,8 @@ class Main extends PluginBase implements Listener
 
     private function sendReplacementBlockPacket(array $players, Vector3 $pos, int $id): void
     {
-        $pk = new UpdateBlockPacket();
-        $pk->x = $pos->x;
-        $pk->y = $pos->y;
-        $pk->z = $pos->z;
-        $pk->blockRuntimeId = $id;
-        $pk->flags = UpdateBlockPacket::FLAG_NONE;
+        $blockPosition = new BlockPosition((int) $pos->x, (int) $pos->y, (int) $pos->z);
+        $pk = UpdateBlockPacket::create($blockPosition, $id, UpdateBlockPacket::FLAG_NONE, 0);
         foreach ($players as $player) {
             if ($player instanceof Player) {
                 $player->getNetworkSession()->sendDataPacket($pk);
